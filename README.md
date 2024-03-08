@@ -142,3 +142,27 @@ If you have any feedback, please reach out to us at support@thirdweb.com.
 ## License
 
 [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+## 動かした履歴
+
+- ビルド
+
+  ```bash
+  forge build
+  ```
+
+  ```bash
+  $ forge build
+  [⠘] Compiling...
+  [⠒] Compiling 829 files with 0.8.23
+  [⠘] Solc 0.8.23 finished in 1661.20s
+  Compiler run successful with warnings:
+  ```
+
+- テスト
+
+  ```bash
+  forge test
+  ```
+
+  問題なければ全て実行されます。
