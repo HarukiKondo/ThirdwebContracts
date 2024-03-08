@@ -162,7 +162,68 @@ If you have any feedback, please reach out to us at support@thirdweb.com.
 - テスト
 
   ```bash
-  forge test
+  forge test --gas-report
   ```
 
   問題なければ全て実行されます。
+
+  ```bash
+  uite result: ok. 48 passed; 0 failed; 0 skipped; finished in 906.87ms (42.93ms CPU time)
+  ```
+
+  特定のテストだけ実行させたいとき
+
+  ```bash
+  forge test --match-path src/test/token/TokenERC721.t.sol
+  ```
+
+  実行結果
+
+  ```bash
+  [⠃] Compiling...
+  formFeeInfo() (gas: 31951)
+  [PASS] test_event_royaltyForToken() (gas: 66943)
+  [PASS] test_event_setOwner() (gas: 107506)
+  [PASS] test_event_setPrimarySaleRecipient() (gas: 26242)
+  [PASS] test_revert_burn_NotOwnerNorApproved() (gas: 167454)
+  [PASS] test_revert_mintTo_NotAuthorized() (gas: 83395)
+  [PASS] test_revert_mintNo files changed, compilation skipped
+
+  Ran 39 tests for src/test/token/TokenERC721.t.sol:TokenERC721Test
+  [PASS] test_event_defaultRoyalty() (gas: 32193)
+  [PASS] test_event_mintTo() (gas: 159309)
+  [PASS] test_event_mintWithSignature() (gas: 275443)
+  [PASS] test_event_platTo_emptyURI() (gas: 48184)
+  [PASS] test_revert_mintWithSignature_InvalidSignature() (gas: 80854)
+  [PASS] test_revert_mintWithSignature_MsgValueNotZero() (gas: 330852)
+  [PASS] test_revert_mintWithSignature_MustSendTotalPrice() (gas: 321693)
+  [PASS] test_revert_mintWithSignature_RecipientUndefined() (gas: 81498)
+  [PASS] test_revert_mintWithSignature_RequestExpired() (gas: 77361)
+  [PASS] test_revert_setContractURI() (gas: 76772)
+  [PASS] test_revert_setDefaultRoyaltyInfo_ExceedsRoyaltyBps() (gas: 19502)
+  [PASS] test_revert_setDefaultRoyaltyInfo_NotAuthorized() (gas: 77108)
+  [PASS] test_revert_setOwner_NotModuleAdmin() (gas: 21155)
+  [PASS] test_revert_setPlatformFeeInfo_ExceedsMaxBps() (gas: 19140)
+  [PASS] test_revert_setPlatformFeeInfo_NotAuthorized() (gas: 76729)
+  [PASS] test_revert_setPrimarySaleRecipient_NotAuthorized() (gas: 76375)
+  [PASS] test_revert_setRoyaltyInfoForToken_ExceedsRoyaltyBps() (gas: 19118)
+  [PASS] test_revert_setRoyaltyInfo_NotAuthorized() (gas: 76935)
+  [PASS] test_setTokenURI_revert_Frozen() (gas: 45092)
+  [PASS] test_setTokenURI_revert_NotAuthorized() (gas: 17694)
+  [PASS] test_setTokenURI_state() (gas: 48329)
+  [PASS] test_state_burn_TokenOperator() (gas: 167872)
+  [PASS] test_state_burn_TokenOwner() (gas: 145060)
+  [PASS] test_state_mintTo() (gas: 169775)
+  [PASS] test_state_mintWithSignature_NonZeroPrice_ERC20() (gas: 404860)
+  [PASS] test_state_mintWithSignature_NonZeroPrice_NativeToken() (gas: 394911)
+  [PASS] test_state_mintWithSignature_ZeroPrice() (gas: 279989)
+  [PASS] test_state_setContractURI() (gas: 27719)
+  [PASS] test_state_setDefaultRoyaltyInfo() (gas: 38711)
+  [PASS] test_state_setOwner() (gas: 107260)
+  [PASS] test_state_setPlatformFeeInfo() (gas: 31959)
+  [PASS] test_state_setPrimarySaleRecipient() (gas: 25422)
+  [PASS] test_state_setRoyaltyInfoForToken() (gas: 66916)
+  Suite result: ok. 39 passed; 0 failed; 0 skipped; finished in 489.89ms (20.43ms CPU time)
+
+  Ran 1 test suite in 676.78ms (489.89ms CPU time): 39 tests passed, 0 failed, 0 skipped (39 total tests)
+  ```
