@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
+// TokenERC721およびNFTMetadata2つのコントラクトをインポート
 import { TokenERC721, NFTMetadata } from "contracts/prebuilts/token/TokenERC721.sol";
 
 // Test imports
@@ -8,6 +9,9 @@ import { TokenERC721, NFTMetadata } from "contracts/prebuilts/token/TokenERC721.
 import "../utils/BaseTest.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
+/**
+ * TokenERC721コントラクトのテストコード
+ */
 contract TokenERC721Test is BaseTest {
     using Strings for uint256;
 
@@ -41,12 +45,15 @@ contract TokenERC721Test is BaseTest {
 
     using stdStorage for StdStorage;
 
+    /**
+     * テスト前のセットアップ
+     */
     function setUp() public override {
         super.setUp();
         deployerSigner = signer;
         recipient = address(0x123);
         tokenContract = TokenERC721(getContract("TokenERC721"));
-
+        // テスト用のERC20トークンなどを発行する。 
         erc20.mint(deployerSigner, 1_000);
         vm.deal(deployerSigner, 1_000);
 
@@ -71,15 +78,18 @@ contract TokenERC721Test is BaseTest {
         _mintrequest.royaltyBps = royaltyBps;
         _mintrequest.primarySaleRecipient = saleRecipient;
         _mintrequest.uri = "ipfs://";
-        _mintrequest.price = 0;
-        _mintrequest.currency = address(0);
+        _mintrequest.price = 0;  // デフォルトは 0 ETH
+        _mintrequest.currency = address(0); // 支払いのデフォルトはNativeトークン
         _mintrequest.validityStartTimestamp = 1000;
         _mintrequest.validityEndTimestamp = 2000;
         _mintrequest.uid = bytes32(0);
-
+        // ミントするための署名データを作成
         _signature = signMintRequest(_mintrequest, privateKey);
     }
 
+    /**
+     * signMintRequest function
+     */
     function signMintRequest(
         TokenERC721.MintRequest memory _request,
         uint256 _privateKey
@@ -99,7 +109,7 @@ contract TokenERC721Test is BaseTest {
         );
         bytes32 structHash = keccak256(encodedRequest);
         bytes32 typedDataHash = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-
+        // 署名データを作成
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_privateKey, typedDataHash);
         bytes memory sig = abi.encodePacked(r, s, v);
 
@@ -110,6 +120,9 @@ contract TokenERC721Test is BaseTest {
                         Unit tests: `mintWithSignature`
     //////////////////////////////////////////////////////////////*/
 
+    /**
+     * 0 ETH でNFTをミントするテストコード
+     */
     function test_state_mintWithSignature_ZeroPrice() public {
         vm.warp(1000);
 
@@ -130,6 +143,9 @@ contract TokenERC721Test is BaseTest {
         assertEq(tokenContract.ownerOf(nextTokenId), recipient);
     }
 
+    /**
+     * TokenでNFTをミントするテストコード
+     */
     function test_state_mintWithSignature_NonZeroPrice_ERC20() public {
         vm.warp(1000);
 
@@ -140,6 +156,7 @@ contract TokenERC721Test is BaseTest {
 
         // approve erc20 tokens to tokenContract
         vm.prank(recipient);
+        // approveする
         erc20.approve(address(tokenContract), 1);
 
         // initial balances and state
@@ -152,6 +169,7 @@ contract TokenERC721Test is BaseTest {
 
         // mint with signature
         vm.prank(recipient);
+        // NFTをミントする
         tokenContract.mintWithSignature(_mintrequest, _signature);
 
         // check state after minting
@@ -185,6 +203,7 @@ contract TokenERC721Test is BaseTest {
 
         // mint with signature
         vm.prank(recipient);
+        // NFTをミントする
         tokenContract.mintWithSignature{ value: 1 }(_mintrequest, _signature);
 
         // check state after minting
@@ -200,6 +219,9 @@ contract TokenERC721Test is BaseTest {
         assertEq(address(saleRecipient).balance, etherBalanceOfSeller + _mintrequest.price - _platformFees);
     }
 
+    /**
+     * 支払い額が満たないときにエラーが発生するかチェックする。
+     */
     function test_revert_mintWithSignature_MustSendTotalPrice() public {
         vm.warp(1000);
 
@@ -212,6 +234,9 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintWithSignature{ value: 0 }(_mintrequest, _signature);
     }
 
+    /**
+     * ERC20規格のトークンで支払いするときにネイティブトークンの送金額が0になることを確認するテストコード
+     */
     function test_revert_mintWithSignature_MsgValueNotZero() public {
         vm.warp(1000);
 
@@ -225,6 +250,9 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintWithSignature{ value: 1 }(_mintrequest, _signature);
     }
 
+    /**
+     * 適当な秘密鍵で署名したときにミントが失敗するかチェックするテストコード
+     */
     function test_revert_mintWithSignature_InvalidSignature() public {
         vm.warp(1000);
 
@@ -236,6 +264,9 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintWithSignature(_mintrequest, _signature);
     }
 
+    /**
+     * 時間切れで署名データが無効になることを確認するテストコード
+     */
     function test_revert_mintWithSignature_RequestExpired() public {
         _signature = signMintRequest(_mintrequest, privateKey);
 
@@ -247,6 +278,9 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintWithSignature(_mintrequest, _signature);
     }
 
+    /**
+     * ミント先のアドレスが適切かどうかを確認するテストコード
+     */
     function test_revert_mintWithSignature_RecipientUndefined() public {
         vm.warp(1000);
 
@@ -258,6 +292,9 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintWithSignature(_mintrequest, _signature);
     }
 
+    /**
+     * NFTをミントする際に想定したイベントが発火するかチェックするテストコード
+     */
     function test_event_mintWithSignature() public {
         vm.warp(1000);
 
@@ -363,9 +400,11 @@ contract TokenERC721Test is BaseTest {
         tokenContract.mintTo(recipient, _tokenURI);
 
         vm.prank(recipient);
+        // 全権限を委譲する
         tokenContract.setApprovalForAll(operator, true);
 
         vm.prank(operator);
+        // NFTを償却する
         tokenContract.burn(nextTokenId);
 
         assertEq(tokenContract.nextTokenIdToMint(), nextTokenId + 1);
@@ -684,6 +723,7 @@ contract TokenERC721Test is BaseTest {
         string memory uri = "uri_string";
 
         vm.startPrank(deployerSigner);
+        // メタデータを凍結する。
         tokenContract.freezeMetadata();
 
         vm.expectRevert(abi.encodeWithSelector(NFTMetadata.NFTMetadataFrozen.selector, 0));

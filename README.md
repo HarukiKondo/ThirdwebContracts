@@ -227,3 +227,9 @@ If you have any feedback, please reach out to us at support@thirdweb.com.
 
   Ran 1 test suite in 676.78ms (489.89ms CPU time): 39 tests passed, 0 failed, 0 skipped (39 total tests)
   ```
+
+- テストカバレッジの確認方法
+
+  ```bash
+  forge coverage --report lcov
+  ```
