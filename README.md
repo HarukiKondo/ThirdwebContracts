@@ -174,7 +174,7 @@ If you have any feedback, please reach out to us at support@thirdweb.com.
   特定のテストだけ実行させたいとき
 
   ```bash
-  forge test --match-path src/test/token/TokenERC721.t.sol
+  forge test --gas-report --match-path src/test/token/TokenERC721.t.sol
   ```
 
   実行結果
@@ -226,6 +226,12 @@ If you have any feedback, please reach out to us at support@thirdweb.com.
   Suite result: ok. 39 passed; 0 failed; 0 skipped; finished in 489.89ms (20.43ms CPU time)
 
   Ran 1 test suite in 676.78ms (489.89ms CPU time): 39 tests passed, 0 failed, 0 skipped (39 total tests)
+  ```
+
+- ガスレポート付きで出させる方法
+
+  ```bash
+  forge test --gas-report --match-path src/test/benchmark/TokenERC721Benchmark.t.sol
   ```
 
 - テストカバレッジの確認方法
